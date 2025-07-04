@@ -1,0 +1,29 @@
+const express = require("express");
+const router = express.Router();
+const Product = require("../models/Product");
+
+// Add a product (public or protected)
+router.post("/", async (req, res) => {
+  const { name, price, description } = req.body;
+  try {
+    const newProduct = new Product({ name, price, description });
+    await newProduct.save();
+    res.json({ message: "Product added", product: newProduct });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to add product" });
+  }
+});
+
+// Get all products
+router.get("/", async (req, res) => {
+  try {
+    const products = await Product.find();
+    res.json(products);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch products" });
+  }
+});
+
+module.exports = router;

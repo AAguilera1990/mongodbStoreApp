@@ -1,0 +1,31 @@
+const express = require("express");
+const router = express.Router();
+const Order = require("../models/Order");
+
+// Add new order
+router.post("/", async (req, res) => {
+  const { userId, productIds } = req.body;
+  try {
+    const newOrder = new Order({ userId, productIds });
+    await newOrder.save();
+    res.json({ message: "Order placed", order: newOrder });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Order failed" });
+  }
+});
+
+// Get all orders
+router.get("/", async (req, res) => {
+  try {
+    const orders = await Order.find()
+      .populate("userId", "username")
+      .populate("productIds", "name price");
+    res.json(orders);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to fetch orders" });
+  }
+});
+
+module.exports = router;
